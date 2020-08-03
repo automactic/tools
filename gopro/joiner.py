@@ -1,12 +1,13 @@
+import logging
 import pathlib
 import subprocess
 from collections import defaultdict
-import logging
 from tempfile import NamedTemporaryFile
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
 
 class GoProFileJoiner:
     def __init__(self, in_path, out_path):
@@ -42,4 +43,4 @@ class GoProFileJoiner:
             lines = '\n'.join(lines)
             manifest.write(lines)
             manifest.flush()
-            subprocess.run(f'ffmpeg -safe 0 -f concat -i {manifest.name} -c copy {output}', shell=True)
+            subprocess.run(f'./ffmpeg -safe 0 -f concat -i {manifest.name} -c:v copy -c:a copy {output} -v quiet', shell=True)
