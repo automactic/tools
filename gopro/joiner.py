@@ -3,7 +3,7 @@ import pathlib
 import subprocess
 from collections import defaultdict
 from tempfile import NamedTemporaryFile
-
+import ffmpeg_progress
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -20,14 +20,20 @@ class GoProFileJoiner:
         files = [file for file in pathlib.Path(dir).glob('**/*') if file.is_file()]
         for file in files:
             group_name = file.name.split('.')[0][-3:]
+            if not group_name:
+                continue
+            if file.suffix.lower() != '.mp4':
+                continue
             groups[group_name].add(file)
         return groups
 
     def process(self):
         groups = self._get_file_groups(self.in_path)
-        logger.info(f'found {len(groups)} group(s) -- {list(groups.keys())}')
+        group_names = sorted(groups.keys())
+        logger.info(f'found {len(group_names)} group(s) -- {group_names}')
 
-        for group_name, group in groups.items():
+        for group_name in group_names:
+            group = groups[group_name]
             output = pathlib.Path(self.out_path).joinpath(f'{group_name}_joined.mp4')
             self._join(group_name, group, output)
 
@@ -43,4 +49,12 @@ class GoProFileJoiner:
             lines = '\n'.join(lines)
             manifest.write(lines)
             manifest.flush()
-            subprocess.run(f'./ffmpeg -safe 0 -f concat -i {manifest.name} -c:v copy -c:a copy {output} -v quiet', shell=True)
+            subprocess.run([
+                './ffmpeg',
+                '-safe', '0',
+                '-f', 'concat',
+                '-i', manifest.name,
+                '-c', 'copy',
+                output
+            ])
+
