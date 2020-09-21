@@ -3,7 +3,7 @@ import pathlib
 import subprocess
 from collections import defaultdict
 from tempfile import NamedTemporaryFile
-import ffmpeg_progress
+
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
