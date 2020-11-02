@@ -55,7 +55,7 @@ class GoProFileJoiner:
             manifest.write('\n'.join(lines))
             manifest.flush()
             subprocess.run([
-                '/usr/local/bin/ffmpeg',
+                'ffmpeg',
                 '-safe', '0',
                 '-f', 'concat',
                 '-i', manifest.name,
