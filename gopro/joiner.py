@@ -36,6 +36,8 @@ class GoProFileJoiner:
         for group_name in group_names:
             group = groups[group_name]
             output = pathlib.Path(self.out_path).joinpath(f'{group_name}_joined.mp4')
+            if output.exists():
+                continue
             self._join(group_name, group, output)
 
     @staticmethod
